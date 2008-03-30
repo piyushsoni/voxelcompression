@@ -763,6 +763,7 @@ int main(int argc,char **argv)
 		touched[(int) (floor(queueHead->voxelx + currentPearl->Center.x))]
 			   [(int) (floor(queueHead->voxely + currentPearl->Center.y))]
 			   [(int) (floor(queueHead->voxelz + currentPearl->Center.z))] = 1;
+
 		voxCount++;
 
 		while(queueHead){
