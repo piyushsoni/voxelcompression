@@ -767,7 +767,6 @@ int main(int argc,char **argv)
 		voxCount++;
 
 		while(queueHead){
-
 			// send
 
 			// print?
@@ -1529,7 +1528,7 @@ void readModelFile( char * filename , Pearl **pearlListHead , int *numPearls){
 	Pearl *currentPearl = NULL;
 
 	FILE * fp;
-	char str[100], str1[1000];
+	//char str[100], str1[1000];
 	fp = fopen(filename, "r");
 	if( fp == NULL ){
 		fprintf(stderr,"Unable to open input file %s",filename);
@@ -1586,34 +1585,126 @@ void readModelFile( char * filename , Pearl **pearlListHead , int *numPearls){
 }
 
 
+//void subdivide(Pearl* pearlListHead, int *numPearls, int *numSubPearls)
+//{	
+//	while(1)
+//	{
+//		if(SubdivisionDone>PEARL_SUBDIVISION_LEVEL) return;
+//		++SubdivisionDone;
+//		//sphere(-width+SubdivisionDone*50,-height+50,-depth+50,10);
+//		Pearl* temp = pearlListHead;
+//		//Pearl* subHead = NULL;
+//		Pearl *create = NULL;
+//		Point3D a,b,c,d;
+//		//Create two dummy  points in the start and in the end, using linear prediction. 
+//		Vector3D BA = temp->next->Center.VectorTo(temp->Center);
+//		Vector3D CB = temp->next->next->Center.VectorTo(temp->next->Center);
+//		
+//		Point3D start = temp->Center.Clone().TranslateBy(BA);
+//		//Point3D start = temp->Center.Clone().TranslateBy(BA.ScaleBy(2).Subtract(CB));
+//
+//		Point3D end = pearlListTail->Center.Clone().TranslateBy(pearlListTail->prev->Center.VectorTo(pearlListTail->Center));
+//		b = temp->Center, c= temp->next->Center, d = temp->next->next->Center;
+//		Point3D inserted = start.MidPointWith(d).TranslateBy(start.MidPointWith(d).VectorTo(b.MidPointWith(c)).ScaleBy(9.0/8));
+//		
+//		//glColor3f(128,128,0);
+//		//start.DrawSphere(150);
+//		//start.Print("Start"); 
+//		temp=temp->next->next;  
+//		
+//		create = new Pearl(TotalPearlCount++, inserted, (temp->prev->radius+temp->prev->prev->radius)/2,1);
+//		(*numSubPearls)++;
+//		temp->prev->prev->next=create;
+//		create->next=temp->prev;
+//		create->prev=temp->prev->prev;
+//		
+//		temp=temp->next;
+//
+//		//temp will always point to the 4th point in the 4 point subdivision :)
+//		//This is done to prevent two runs on the list - the insertion can be done in one traversal only. 
+//		//The problem with simple insertion is - we can't consider new inserted points to generate others. 
+//		while(temp)
+//		{
+//
+//
+//			a = temp->prev->prev->prev->Center, b= temp->prev->prev->Center, c = temp->prev->Center, d = temp->Center;
+//
+//			//Correct the wrong pointer of last iteration: 
+//			temp->prev->prev->prev=create;
+//
+//			inserted = a.MidPointWith(d).TranslateBy(a.MidPointWith(d).VectorTo(b.MidPointWith(c)).ScaleBy(9.0/8));
+//			create = new Pearl(TotalPearlCount++, inserted, (temp->prev->radius+temp->prev->prev->radius)/2,1);
+//			(*numSubPearls)++;
+//			if(create==NULL) {cout<<"Error! Can not allocate memory!!"; exit(1);}
+//
+//			temp->prev->prev->next=create;
+//			create->next=temp->prev;
+//			create->prev=temp->prev->prev;
+//			
+//
+//			temp=temp->next;
+//			
+//		}
+//		
+//		pearlListTail->prev->prev=create;
+//		inserted = b.MidPointWith(end).TranslateBy(b.MidPointWith(end).VectorTo(c.MidPointWith(d)).ScaleBy(9.0/8));
+//		create = new Pearl(TotalPearlCount++, inserted, (pearlListTail->radius+pearlListTail->prev->radius)/2,1);
+//		(*numSubPearls)++;
+//		//insert last point
+//		create->next=pearlListTail; 
+//		create->prev=pearlListTail->prev;
+//		pearlListTail->prev->next=create; 
+//		pearlListTail->prev=create;
+//
+//		//drawPearls();
+//	}
+//}
+//
+//
+//
+//
+//
+//
+
+
 void subdivide(Pearl* pearlListHead, int *numPearls, int *numSubPearls)
 {	
-	while(1)
+	float tempRad;
+	Pearl* temp = NULL; 
+	//Pearl* subHead = NULL;
+	Pearl *create = NULL;
+	Point3D a,b,c,d, start, end, inserted;	
+	Vector3D BA, CB;
+
+	while(SubdivisionDone++<PEARL_SUBDIVISION_LEVEL)
 	{
-		if(SubdivisionDone>PEARL_SUBDIVISION_LEVEL) return;
-		++SubdivisionDone;
-		//sphere(-width+SubdivisionDone*50,-height+50,-depth+50,10);
-		Pearl* temp = pearlListHead;
-		//Pearl* subHead = NULL;
-		Pearl *create = NULL;
-		Point3D a,b,c,d;
+		temp = pearlListHead;
 		//Create two dummy  points in the start and in the end, using linear prediction. 
-		Vector3D BA = temp->next->Center.VectorTo(temp->Center);
-		Vector3D CB = temp->next->next->Center.VectorTo(temp->next->Center);
+		BA= temp->next->Center.VectorTo(temp->Center);
+		CB = temp->next->next->Center.VectorTo(temp->next->Center);
 		
-		Point3D start = temp->Center.Clone().TranslateBy(BA);
+		start = temp->Center.Clone().TranslateBy(BA);
 		//Point3D start = temp->Center.Clone().TranslateBy(BA.ScaleBy(2).Subtract(CB));
 
-		Point3D end = pearlListTail->Center.Clone().TranslateBy(pearlListTail->prev->Center.VectorTo(pearlListTail->Center));
+		end = pearlListTail->Center.Clone().TranslateBy(pearlListTail->prev->Center.VectorTo(pearlListTail->Center));
 		b = temp->Center, c= temp->next->Center, d = temp->next->next->Center;
-		Point3D inserted = start.MidPointWith(d).TranslateBy(start.MidPointWith(d).VectorTo(b.MidPointWith(c)).ScaleBy(9.0/8));
+		inserted = start.MidPointWith(d).TranslateBy(start.MidPointWith(d).VectorTo(b.MidPointWith(c)).ScaleBy(9.0/8));
 		
 		//glColor3f(128,128,0);
 		//start.DrawSphere(150);
 		//start.Print("Start"); 
 		temp=temp->next->next;  
+		//tempRad = (temp->prev->radius+temp->prev->prev->radius)/2; 
+		tempRad = 9*(temp->prev->radius+temp->prev->prev->radius)/16 - (temp->radius+temp->prev->prev->radius)/16;
+		create = new Pearl(TotalPearlCount++, inserted, tempRad ,1);
 		
-		create = new Pearl(TotalPearlCount++, inserted, (temp->prev->radius+temp->prev->prev->radius)/2,1);
+		//if(maxX<inserted.x+tempRad) maxX=inserted.x+tempRad;
+		//else if(minX>inserted.x-tempRad) minX=inserted.x-tempRad;
+		//if(maxY<inserted.y+tempRad) maxY=inserted.y+tempRad;
+		//else if(minY>inserted.y-tempRad) minY=inserted.y-tempRad;
+		//if(maxZ<inserted.z+tempRad) maxZ=inserted.z+tempRad;
+		//else if(minZ>inserted.z-tempRad) minZ=inserted.z-tempRad;
+		
 		(*numSubPearls)++;
 		temp->prev->prev->next=create;
 		create->next=temp->prev;
@@ -1634,7 +1725,18 @@ void subdivide(Pearl* pearlListHead, int *numPearls, int *numSubPearls)
 			temp->prev->prev->prev=create;
 
 			inserted = a.MidPointWith(d).TranslateBy(a.MidPointWith(d).VectorTo(b.MidPointWith(c)).ScaleBy(9.0/8));
-			create = new Pearl(TotalPearlCount++, inserted, (temp->prev->radius+temp->prev->prev->radius)/2,1);
+			
+			//tempRad = (temp->prev->radius+temp->prev->prev->radius)/2;
+			tempRad = 9*(temp->prev->radius+temp->prev->prev->radius)/16 - (temp->radius+temp->prev->prev->prev->radius)/16;
+			create = new Pearl(TotalPearlCount++, inserted, tempRad,1);
+
+			//if(maxX<inserted.x+tempRad) maxX=inserted.x+tempRad;
+			//else if(minX>inserted.x-tempRad) minX=inserted.x-tempRad;
+			//if(maxY<inserted.y+tempRad) maxY=inserted.y+tempRad;
+			//else if(minY>inserted.y-tempRad) minY=inserted.y-tempRad;
+			//if(maxZ<inserted.z+tempRad) maxZ=inserted.z+tempRad;
+			//else if(minZ>inserted.z-tempRad) minZ=inserted.z-tempRad;
+
 			(*numSubPearls)++;
 			if(create==NULL) {cout<<"Error! Can not allocate memory!!"; exit(1);}
 
@@ -1660,8 +1762,6 @@ void subdivide(Pearl* pearlListHead, int *numPearls, int *numSubPearls)
 		//drawPearls();
 	}
 }
-
-
 
 
 
