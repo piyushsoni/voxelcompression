@@ -28,7 +28,7 @@ using namespace Pi;
 int winWidth  = 512;
 int winHeight = 512;
 #define VOLUME_DIMENSION 512
-#define PEARL_SUBDIVISION_LEVEL 2
+#define PEARL_SUBDIVISION_LEVEL 5
 
 enum EventType {ENTRY, EXIT};
 
